@@ -33,7 +33,6 @@ func NewStockService(db *gorm.DB, br repository.BankRepository, wr repository.Wa
 
 func (s *StockService) Trade(walletExternalID, stockName, tradeType string) error {
 	return s.db.Transaction(func(tx *gorm.DB) error {
-		// 1. Get or create wallet
 		wallet, err := s.walletRepo.GetByID(tx, walletExternalID)
 		if err != nil {
 			return err
@@ -45,7 +44,6 @@ func (s *StockService) Trade(walletExternalID, stockName, tradeType string) erro
 			}
 		}
 
-		// 2. Get stock from bank
 		bankStock, err := s.bankRepo.GetStockByName(tx, stockName)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -54,7 +52,6 @@ func (s *StockService) Trade(walletExternalID, stockName, tradeType string) erro
 			return err
 		}
 
-		// 3. Process trade
 		if tradeType == "buy" {
 			if bankStock.Quantity < 1 {
 				return ErrInsufficientStock
@@ -100,7 +97,6 @@ func (s *StockService) Trade(walletExternalID, stockName, tradeType string) erro
 			return fmt.Errorf("invalid trade type: %s", tradeType)
 		}
 
-		// 4. Audit log (only successful operations)
 		audit := &models.AuditLog{
 			Type:      tradeType,
 			WalletID:  walletExternalID,
