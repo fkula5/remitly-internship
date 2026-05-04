@@ -36,7 +36,6 @@ func InitDB() error {
 
 	log.Println("Database connection established")
 
-	// AutoMigrate the models
 	err = DB.AutoMigrate(
 		&models.BankStock{},
 		&models.Wallet{},
